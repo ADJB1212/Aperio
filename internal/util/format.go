@@ -66,3 +66,17 @@ func commaUnsigned(s string) string {
 	}
 	return b.String()
 }
+
+func Colorize(s string, fg int, bg int) string {
+	var parts []string
+	if fg >= 0 {
+		parts = append(parts, fmt.Sprintf("38;5;%d", fg))
+	}
+	if bg >= 0 {
+		parts = append(parts, fmt.Sprintf("48;5;%d", bg))
+	}
+	if len(parts) == 0 {
+		return s
+	}
+	return "\x1b[" + strings.Join(parts, ";") + "m" + s + "\x1b[0m"
+}

@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 )
 
@@ -103,8 +104,8 @@ func ParseArgs(args []string, stdin *os.File) (Config, error) {
 	if _, ok := validFormat[cfg.Format]; !ok {
 		return Config{}, &UsageError{Msg: fmt.Sprintf("Invalid --format value: %q\n\n%s", cfg.Format, Usage())}
 	}
-	if cfg.Jobs < 1 {
-		cfg.Jobs = 1
+	if cfg.Jobs <= 0 {
+		cfg.Jobs = 0
 	}
 
 	// Resolve files from remaining args or from stdin when piped
@@ -133,10 +134,7 @@ func ParseArgs(args []string, stdin *os.File) (Config, error) {
 }
 
 func defaultJobs() int {
-	// Keep this minimal here; leave runtime.NumCPU() to the caller if desired.
-	// We return 0 here to signal "use runtime.NumCPU()" if the caller prefers.
-	// But for simplicity, set to 1 and let caller override if they want CPUs.
-	return 1
+	return runtime.NumCPU()
 }
 
 func hasPipedInput(stdin *os.File) bool {

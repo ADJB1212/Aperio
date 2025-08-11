@@ -4,3 +4,4 @@ dist/
 pkg/
 *.txt
 *.sh
+test_files/

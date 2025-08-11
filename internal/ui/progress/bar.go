@@ -20,7 +20,6 @@ type Bar struct {
 	lastLen      int
 }
 
-// New creates a progress bar configured with sensible defaults.
 func New(out io.Writer, width int) *Bar {
 	if out == nil {
 		out = os.Stderr

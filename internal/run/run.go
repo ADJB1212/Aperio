@@ -46,9 +46,6 @@ func Run(version string) int {
 	if jobs <= 0 {
 		jobs = runtime.NumCPU()
 	}
-	if jobs < 1 {
-		jobs = 1
-	}
 
 	// Analyze files concurrently
 	results := make(chan analyze.FileStats, len(files))
@@ -245,40 +242,44 @@ func writeTable(stats []analyze.FileStats, showSum bool, plain bool, commas bool
 		if !noIcons {
 			if ic := icons.Icon(fs.Name); ic != "" {
 				// Colorize icon based on extension (best-effort).
-				colorCode := func(ext string) string {
+				colorCode := func(ext string) int {
 					switch strings.ToLower(ext) {
 					case ".go":
-						return "36" // cyan
+						return 51
 					case ".rs":
-						return "33" // yellow/orange
+						return 202
 					case ".js", ".jsx", ".mjs", ".cjs":
-						return "33" // yellow
+						return 184
 					case ".ts", ".tsx":
-						return "34" // blue
+						return 27
 					case ".py":
-						return "34" // blue
+						return 220
 					case ".c", ".h", ".hpp", ".hh", ".hxx", ".cc", ".cpp", ".cxx":
-						return "34" // blue
+						return 27
 					case ".java", ".scala", ".swift", ".rb":
-						return "31" // red
+						return 196
 					case ".kt", ".kts", ".php", ".hs":
-						return "35" // magenta
+						return 129
 					case ".lua":
-						return "34" // blue
+						return 33
 					case ".html":
-						return "31" // red
+						return 160
+					case ".cs", ".csx":
+						return 55
 					case ".css", ".scss", ".sass", ".less":
-						return "36" // cyan
+						return 162
 					case ".json", ".yaml", ".yml", ".toml", ".ini":
-						return "36" // cyan
-					case ".sh", ".bash", ".zsh", ".ksh", ".fish":
-						return "32" // green
+						return 242
+					case ".sh", ".bash", ".zsh", ".ksh", ".fish", ".vim":
+						return 41
+					case ".zig":
+						return 208
 					default:
-						return "36" // generic default
+						return 244
 					}
 				}(fs.Ext)
-				colored := "\x1b[" + colorCode + "m" + ic + "\x1b[0m"
-				extDisplay = fs.Ext + " " + colored
+				coloredIcon := util.Colorize(ic, colorCode, -1)
+				extDisplay = fs.Ext + " " + coloredIcon
 			}
 		}
 
