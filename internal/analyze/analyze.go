@@ -61,15 +61,12 @@ func AnalyzeFile(path string, out chan<- FileStats, wg *sync.WaitGroup) {
 	stat.Kind = "text"
 	if stat.SizeBytes > 0 {
 		const sniffSize = 8192
-		toRead := int64(sniffSize)
-		if stat.SizeBytes < toRead {
-			toRead = stat.SizeBytes
-		}
+		toRead := min(stat.SizeBytes, int64(sniffSize))
 		sniff := make([]byte, toRead)
 		if n, _ := f.ReadAt(sniff, 0); n > 0 {
 			isBin := false
 			// Quick NUL check
-			for i := 0; i < n; i++ {
+			for i := range n {
 				if sniff[i] == 0x00 {
 					isBin = true
 					break
@@ -123,10 +120,7 @@ func AnalyzeFile(path string, out chan<- FileStats, wg *sync.WaitGroup) {
 
 			// Complete a partial UTF-8 rune from previous chunk, if any.
 			if leftN > 0 {
-				need := 4 - leftN
-				if need > n {
-					need = n
-				}
+				need := min(4-leftN, n)
 				copy(leftover[leftN:], buf[:need])
 				seq := leftover[:leftN+need]
 				r, size := utf8.DecodeRune(seq)

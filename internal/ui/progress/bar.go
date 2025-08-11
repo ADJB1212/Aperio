@@ -7,46 +7,17 @@ import (
 	"strings"
 )
 
-// Bar renders a single-line progress bar with Unicode block characters,
-// including partial cell resolution using left-to-right fractional blocks.
-//
-// Example output:
-//
-//	[██████████▊                    ]  36% (36/100)
-//
-// It writes updates using a carriage return prefix so the line is updated in place.
-// Call Finish() to print a trailing newline when complete.
 type Bar struct {
-	// Out is the writer to render to (defaults to os.Stderr if nil).
-	Out io.Writer
-
-	// Width is the number of visual cells inside the brackets.
-	// Defaults to 40 when zero or negative.
-	Width int
-
-	// ShowPercent controls whether to print a percentage after the bar.
-	ShowPercent bool
-
-	// ShowCounts controls whether to print "(current/total)" after the percentage.
-	ShowCounts bool
-
-	// LeftBracket and RightBracket customize the surrounding delimiters.
-	// Defaults: "[" and "]".
+	Out          io.Writer
+	Width        int
+	ShowPercent  bool
+	ShowCounts   bool
 	LeftBracket  string
 	RightBracket string
-
-	// Fill is the full-cell block (default: '█').
-	Fill rune
-
-	// PartialRunes are 1/8th-resolution left-to-right fractional blocks.
-	// Defaults: ▏ ▎ ▍ ▌ ▋ ▊ ▉
+	Fill         rune
 	PartialRunes []rune
-
-	// Optional label appended after percentage/counts (e.g., file name).
-	Label string
-
-	// internal
-	lastLen int
+	Label        string
+	lastLen      int
 }
 
 // New creates a progress bar configured with sensible defaults.
@@ -108,10 +79,7 @@ func (b *Bar) Render(current, total int) {
 	rem := cells - float64(full)
 
 	// Determine partial cell (1..7), clamp to available width.
-	partialIdx := int(rem * 8.0)
-	if partialIdx > 7 {
-		partialIdx = 7
-	}
+	partialIdx := min(int(rem*8.0), 7)
 	// When fraction is exactly an integer multiple of cell, skip partial.
 	hasPartial := partialIdx > 0 && full < width
 

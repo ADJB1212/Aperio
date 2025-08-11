@@ -5,18 +5,6 @@ import (
 	"strings"
 )
 
-// HumanBytes returns a human-readable, IEC (base-1024) formatted size.
-//
-// Examples:
-//
-//	HumanBytes(0)            => "0 B"
-//	HumanBytes(1023)         => "1023 B"
-//	HumanBytes(1024)         => "1 KiB"
-//	HumanBytes(10*1024)      => "10 KiB"
-//	HumanBytes(1536)         => "1.50 KiB"
-//	HumanBytes(5*1024*1024)  => "5 MiB"
-//
-// Exact multiples are rendered without decimals for compactness.
 func HumanBytes(bytes int64) string {
 	const unit = int64(1024)
 	if bytes < unit {
@@ -38,23 +26,10 @@ func HumanBytes(bytes int64) string {
 	return fmt.Sprintf("%.2f %s", v, units[exp])
 }
 
-// CommaInt formats an integer with thousands separators.
-//
-// Examples:
-//
-//	CommaInt(0)         => "0"
-//	CommaInt(12)        => "12"
-//	CommaInt(1234)      => "1,234"
-//	CommaInt(-9876543)  => "-9,876,543"
 func CommaInt(n int) string {
 	return commaSigned(fmt.Sprintf("%d", n))
 }
 
-// CommaInt64 formats a 64-bit integer with thousands separators.
-//
-// Examples:
-//
-//	CommaInt64(1234567890)  => "1,234,567,890"
 func CommaInt64(n int64) string {
 	return commaSigned(fmt.Sprintf("%d", n))
 }

@@ -1,6 +1,17 @@
+<div align="center">
+
 # Aperio
 
-A fast, zero-dependency CLI to summarize file statistics. Feed it files as arguments or pipe a newline-delimited list of paths via stdin, and it prints a compact table, CSV, or JSON.
+**A blazing-fast, zero-dependency CLI for beautiful file statistics**
+
+_Stream files, count text metrics, and generate stunning tables, CSV, or JSON output_
+
+[![Zero Dependencies](https://img.shields.io/badge/zero--deps-✨%20clean-brightgreen?style=for-the-badge)](.)
+[![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0+-blue?style=for-the-badge)](./LICENSE)
+[![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?style=for-the-badge&logo=go&logoColor=white)](./)
+[![Platform Support](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS-lightgrey?style=for-the-badge)](./)
+
+</div>
 
 What it reports:
 
@@ -33,11 +44,13 @@ No external packages. Standard library only.
 
 ## Install
 
-Prerequisites:
+Homebrew:
 
-- Go toolchain
+```
+brew install ADJB1212/Aperio
+```
 
-Build with Makefile (recommended):
+Build with Makefile (must have Go toolchain):
 
 ```
 make build

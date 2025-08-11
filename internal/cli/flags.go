@@ -11,27 +11,18 @@ import (
 
 // Config captures all command-line options and resolved inputs for aperio.
 type Config struct {
-	// Behavior
 	ShowSum     bool
 	ShowVersion bool
-
-	// Sorting
-	SortBy string // name, ext, size, lines, words, chars, modified
-	Desc   bool   // reverse
-
-	// Output
-	Format   string // table, csv, json
-	NoHeader bool   // CSV only
-	Plain    bool   // ASCII table
-	NoIcons  bool   // Disable Nerd Fonts icons in table output
-
-	// Performance
-	Jobs     int
-	Progress bool
-	Commas   bool
-
-	// Inputs
-	Files []string
+	SortBy      string
+	Desc        bool
+	Format      string
+	NoHeader    bool
+	Plain       bool
+	NoIcons     bool
+	Jobs        int
+	Progress    bool
+	Commas      bool
+	Files       []string
 }
 
 // Usage returns a concise usage string suitable for errors/help.
@@ -56,13 +47,6 @@ type UsageError struct {
 
 func (e *UsageError) Error() string { return e.Msg }
 
-// Parse parses flags from os.Args and resolves the input file list from args or stdin.
-//
-// Notes:
-// - If --version is set, Files may be empty and no further validation is performed.
-// - If no args are provided, and stdin is a pipe, newline-delimited paths are read from stdin.
-// - On invalid flag values, a *UsageError is returned.
-// - On absence of inputs (no args and no stdin), a *UsageError is returned.
 func Parse() (Config, error) {
 	return ParseArgs(os.Args[1:], os.Stdin)
 }
