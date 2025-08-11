@@ -23,6 +23,7 @@ type Config struct {
 	Format   string // table, csv, json
 	NoHeader bool   // CSV only
 	Plain    bool   // ASCII table
+	NoIcons  bool   // Disable Nerd Fonts icons in table output
 
 	// Performance
 	Jobs     int
@@ -89,16 +90,15 @@ func ParseArgs(args []string, stdin *os.File) (Config, error) {
 	fs.IntVar(&cfg.Jobs, "jobs", cfg.Jobs, "Maximum concurrent file analyses")
 	fs.BoolVar(&cfg.Progress, "progress", false, "Show progress bar on stderr")
 	fs.BoolVar(&cfg.Commas, "commas", false, "Format counts (lines, words, chars) with commas")
+	fs.BoolVar(&cfg.NoIcons, "no-icons", false, "Disable Nerd Fonts icons in table output")
 
 	// Aliases
 	fs.BoolVar(&cfg.ShowSum, "s", cfg.ShowSum, "Alias for --sum")
 	fs.BoolVar(&cfg.ShowVersion, "v", cfg.ShowVersion, "Alias for --version")
-	fs.StringVar(&cfg.SortBy, "S", cfg.SortBy, "Alias for --sort")
 	fs.BoolVar(&cfg.Desc, "r", cfg.Desc, "Alias for --desc")
 	fs.StringVar(&cfg.Format, "f", cfg.Format, "Alias for --format")
-	fs.BoolVar(&cfg.Plain, "p", cfg.Plain, "Alias for --plain")
 	fs.IntVar(&cfg.Jobs, "j", cfg.Jobs, "Alias for --jobs")
-	fs.BoolVar(&cfg.Progress, "P", cfg.Progress, "Alias for --progress")
+	fs.BoolVar(&cfg.Progress, "p", cfg.Progress, "Alias for --progress")
 	fs.BoolVar(&cfg.Commas, "c", cfg.Commas, "Alias for --commas")
 
 	if err := fs.Parse(args); err != nil {

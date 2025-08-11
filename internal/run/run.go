@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
 	"runtime"
 	"sort"
 	"strings"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/ADJB1212/Aperio/internal/analyze"
 	"github.com/ADJB1212/Aperio/internal/cli"
+	"github.com/ADJB1212/Aperio/internal/icons"
 	"github.com/ADJB1212/Aperio/internal/ui/progress"
 	"github.com/ADJB1212/Aperio/internal/util"
 )
@@ -105,7 +107,7 @@ func Run(version string) int {
 		}
 		return 0
 	default: // table
-		writeTable(stats, cfg.ShowSum, cfg.Plain, cfg.Commas)
+		writeTable(stats, cfg.ShowSum, cfg.Plain, cfg.Commas, cfg.NoIcons)
 		return 0
 	}
 }
@@ -200,13 +202,15 @@ func writeCSV(stats []analyze.FileStats, header bool) error {
 	return w.Error()
 }
 
-func writeTable(stats []analyze.FileStats, showSum bool, plain bool, commas bool) {
+func writeTable(stats []analyze.FileStats, showSum bool, plain bool, commas bool, noIcons bool) {
 	// Headers: include Kind
 	headers := []string{"File", "Ext", "Kind", "Size", "Lines", "Words", "Chars", "Modified"}
 
 	// helpers
+	reANSI := regexp.MustCompile("\x1b\\[[0-9;]*m")
+	stripANSI := func(s string) string { return reANSI.ReplaceAllString(s, "") }
 	displayWidth := func(s string) int {
-		return utf8.RuneCountInString(s)
+		return utf8.RuneCountInString(stripANSI(s))
 	}
 	padRight := func(s string, width int) string {
 		pad := width - displayWidth(s)
@@ -236,8 +240,50 @@ func writeTable(stats []analyze.FileStats, showSum bool, plain bool, commas bool
 	var totalLines, totalWords, totalChars int
 
 	for _, fs := range stats {
+		// Compose extension display with optional colored Nerd Fonts icon.
+		extDisplay := fs.Ext
+		if !noIcons {
+			if ic := icons.Icon(fs.Name); ic != "" {
+				// Colorize icon based on extension (best-effort).
+				colorCode := func(ext string) string {
+					switch strings.ToLower(ext) {
+					case ".go":
+						return "36" // cyan
+					case ".rs":
+						return "33" // yellow/orange
+					case ".js", ".jsx", ".mjs", ".cjs":
+						return "33" // yellow
+					case ".ts", ".tsx":
+						return "34" // blue
+					case ".py":
+						return "34" // blue
+					case ".c", ".h", ".hpp", ".hh", ".hxx", ".cc", ".cpp", ".cxx":
+						return "34" // blue
+					case ".java", ".scala", ".swift", ".rb":
+						return "31" // red
+					case ".kt", ".kts", ".php", ".hs":
+						return "35" // magenta
+					case ".lua":
+						return "34" // blue
+					case ".html":
+						return "31" // red
+					case ".css", ".scss", ".sass", ".less":
+						return "36" // cyan
+					case ".json", ".yaml", ".yml", ".toml", ".ini":
+						return "36" // cyan
+					case ".sh", ".bash", ".zsh", ".ksh", ".fish":
+						return "32" // green
+					default:
+						return "36" // generic default
+					}
+				}(fs.Ext)
+				colored := "\x1b[" + colorCode + "m" + ic + "\x1b[0m"
+				extDisplay = fs.Ext + " " + colored
+			}
+		}
+
 		if fs.HasError {
-			rows = append(rows, []string{fs.Name, fs.Ext, "-", "-", "-", "-", "-", fs.ErrorText})
+			rows = append(rows, []string{fs.Name, extDisplay, "-", "-", "-", "-", "-", fs.ErrorText})
 			continue
 		}
 		lstr, wstr, cstr := fmtInt(fs.Lines), fmtInt(fs.Words), fmtInt(fs.Chars)
@@ -246,7 +292,7 @@ func writeTable(stats []analyze.FileStats, showSum bool, plain bool, commas bool
 		}
 		rows = append(rows, []string{
 			fs.Name,
-			fs.Ext,
+			extDisplay,
 			fs.Kind,
 			fs.Size,
 			lstr,
