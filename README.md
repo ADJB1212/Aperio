@@ -47,7 +47,7 @@ No external packages. Standard library only.
 Homebrew:
 
 ```
-brew install ADJB1212/Aperio
+brew install adjb1212/aperio/aperio
 ```
 
 Build with Makefile (must have Go toolchain):
@@ -77,16 +77,16 @@ find . -type f -name '*.go' | aperio [options]
 Options:
 
 - Sorting
-  - `--sort, -S` name|ext|size|lines|words|chars|modified (default: name)
+  - `--sort` name|ext|size|lines|words|chars|modified (default: name)
   - `--desc, -r` reverse (descending)
 - Output
   - `--format, -f` table (default), csv, json
-  - `--plain, -p` use ASCII borders for table
+  - `--plain` use ASCII borders for table
   - `--no-header` omit header row in CSV
   - `--commas, -c` format counts (lines, words, chars) with commas in table
 - Totals and progress
   - `--sum, -s` show totals footer (size, lines, words, chars)
-  - `--progress, -P` show a progress bar on stderr
+  - `--progress, -p` show a progress bar on stderr
 - Performance
   - `--jobs, -j` maximum concurrent file analyses (default: number of CPUs)
 - Other
@@ -116,7 +116,7 @@ aperio --sum README.md LICENSE
 Sort by size descending:
 
 ```
-aperio -S size -r --sum README.md LICENSE
+aperio --sort size -r --sum README.md LICENSE
 ```
 
 Plain ASCII table:
@@ -128,7 +128,7 @@ aperio --plain README.md LICENSE
 Progress bar and comma formatting:
 
 ```
-find . -type f -name '*.go' | aperio -j 8 -P -c -s -S lines -r
+find . -type f -name '*.go' | aperio -j 8 -p -c -s --sort lines -r
 ```
 
 CSV:
